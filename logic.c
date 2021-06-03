@@ -29,7 +29,7 @@ getState(const int8_t *state, const uint32_t *mines,
 void
 flag(int8_t *state, unsigned char row, unsigned char col)
 {
-	unsigned char i = BOARD_W * row + col;
+	unsigned short i = BOARD_W * row + col;
 
 	if (state[i] == UNDEF)
 		state[i] = FLAG;
