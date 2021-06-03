@@ -10,20 +10,23 @@ getState(const int8_t *state, const uint32_t *mines,
  * is untouched.
  */
 {
-	unsigned char acc = 0, i = BOARD_W * row + col;
+	unsigned char acc, i = BOARD_W * row + col;
 
 	if (state[i] != -1)
 		return state[i];
 	if (mines[row] >> col & 1)
 		return MINE;
-	acc += mines[row] >> (col + 1) & 1;
-	acc += mines[row + 1] >> (col + 1) & 1;
-	acc += mines[row + 1] >> col & 1;
-	acc += mines[row + 1] >> (col - 1) & 1;
-	acc += mines[row] >> (col - 1) & 1;
-	acc += mines[row - 1] >> (col - 1) & 1;
-	acc += mines[row - 1] >> col & 1;
-	return acc + (mines[row - 1] >> (col + 1) & 1);
+	acc = mines[row] >> (col + 1) & 1;
+	if (row < BOARD_H - 1) {
+		acc += (col && (mines[row + 1] >> (col - 1) & 1)) +
+		(mines[row + 1] >> (col + 1) & 1) + (mines[row + 1] >> col & 1);
+	}
+	acc += (col && (mines[row] >> (col - 1) & 1));
+	if (row) {
+		acc += (col && (mines[row - 1] >> (col - 1) & 1)) + 
+		(mines[row - 1] >> col & 1) + (mines[row - 1] >> (col + 1) & 1);
+	}
+	return acc;
 }
 
 void
