@@ -27,6 +27,17 @@ getState(const int8_t *state, const uint32_t *mines,
 }
 
 void
+flag(int8_t *state, unsigned char row, unsigned char col)
+{
+	unsigned char i = BOARD_W * row + col;
+
+	if (state[i] == UNDEF)
+		state[i] = FLAG;
+	else if (state[i] == FLAG)
+		state[i] = UNDEF;
+}
+
+void
 newGame(game_t *game, unsigned char nMines)
 {
 	short i, j, tiles = BOARD_H * BOARD_W;

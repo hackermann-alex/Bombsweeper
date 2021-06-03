@@ -95,8 +95,16 @@ loop:
 			return;
 		case SDL_MOUSEBUTTONDOWN:
 			getTile(e.button.x, e.button.y, &x, &y);
-			game.state[BOARD_W * y + x] =
-				getState(game.state, game.mines, y, x);
+			if (x < 0 || y < 0)
+				goto loop;
+			switch (e.button.button) {
+			case SDL_BUTTON_LEFT:
+				game.state[BOARD_W * y + x] =
+					getState(game.state, game.mines, y, x);
+				break;
+			case SDL_BUTTON_RIGHT:
+				flag(game.state, y, x);
+			}
 			renderTile(game.state[BOARD_W * y + x], y, x);
 			SDL_RenderPresent(renderer);
 		}

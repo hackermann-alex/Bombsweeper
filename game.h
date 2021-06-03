@@ -21,5 +21,6 @@ void gameLoop();
 void newGame(game_t *game, unsigned char nMines);
 signed char getState(const int8_t *state, const uint32_t *mines,
 		unsigned char row, unsigned char col);
+void flag(int8_t *state, unsigned char row, unsigned char col);
 
 #endif
