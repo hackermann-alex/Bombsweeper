@@ -10,7 +10,8 @@ getState(const int8_t *state, const uint32_t *mines,
  * is untouched.
  */
 {
-	unsigned char acc, i = BOARD_W * row + col;
+	unsigned char acc;
+	unsigned short i = BOARD_W * row + col;
 
 	if (state[i] != -1)
 		return state[i];
