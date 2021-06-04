@@ -79,6 +79,34 @@ getTile(int sx, int sy, signed char *x, signed char *y)
 }
 
 void
+open(int8_t *state, const uint32_t *mines,
+		unsigned char row, unsigned char col)
+{
+	unsigned short i = BOARD_W * row + col;
+	state[i] = getState(state, mines, row, col);
+	renderTile(state[i], row, col);
+
+	if (!state[i]) {
+		if (state[i + 1] == UNDEF && col < BOARD_W - 1)
+			open(state, mines, row, col + 1);
+		if (state[i - BOARD_W + 1] == UNDEF && row && col < BOARD_W - 1)
+			open(state, mines, row - 1, col + 1);
+		if (state[i - BOARD_W] == UNDEF && row)
+			open(state, mines, row - 1, col);
+		if (state[i - BOARD_W - 1] == UNDEF && row && col)
+			open(state, mines, row - 1, col - 1);
+		if (state[i - 1] == UNDEF && col)
+			open(state, mines, row, col - 1);
+		if (state[i + BOARD_W - 1] == UNDEF && row < BOARD_H - 1 && col)
+			open(state, mines, row + 1, col - 1);
+		if (state[i + BOARD_W] == UNDEF && row < BOARD_H - 1)
+			open(state, mines, row + 1, col);
+		if (state[i + BOARD_W + 1] == UNDEF && row < BOARD_H - 1 && col < BOARD_W - 1)
+			open(state, mines, row + 1, col + 1);
+	}
+}
+
+void
 gameLoop()
 {
 	SDL_Event e;
@@ -99,13 +127,12 @@ loop:
 				goto loop;
 			switch (e.button.button) {
 			case SDL_BUTTON_LEFT:
-				game.state[BOARD_W * y + x] =
-					getState(game.state, game.mines, y, x);
+				open(game.state, game.mines, y, x);
 				break;
 			case SDL_BUTTON_RIGHT:
 				flag(game.state, y, x);
+				renderTile(game.state[BOARD_W * y + x], y, x);
 			}
-			renderTile(game.state[BOARD_W * y + x], y, x);
 			SDL_RenderPresent(renderer);
 		}
 	}
