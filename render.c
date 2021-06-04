@@ -16,7 +16,7 @@ enum codes { SUCCESS, INIT_SDL, RENDERER, IMG, TEX, WINDOW };
 static SDL_Renderer *renderer;
 static SDL_Window *window;
 static SDL_Texture *sprites;
-static unsigned char scale;
+static unsigned char scaled;
 static unsigned short originX;
 static unsigned short originY;
 
@@ -27,8 +27,8 @@ renderTile(const int8_t state, unsigned char row, unsigned char col)
 		{TILE_SZ, CHAR_SZ, TILE_SZ, TILE_SZ },
 		{ TILE_SZ << 1, CHAR_SZ, TILE_SZ, TILE_SZ} };
 	SDL_Rect num = { 0, 0, CHAR_SZ, CHAR_SZ },
-		 renderQuad = { originX + scale * col * TILE_SZ,
-			 originY + scale * row * TILE_SZ, scale * TILE_SZ,  scale * TILE_SZ };
+		 renderQuad = { originX + scaled * col,
+			 originY + scaled * row, scaled,  scaled };
 
 	switch (state) {
 	case UNDEF:
@@ -53,7 +53,7 @@ renderTile(const int8_t state, unsigned char row, unsigned char col)
 		SDL_RenderFillRect(renderer, &renderQuad);
 		SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, 0xFF);
 		SDL_RenderDrawRect(renderer, &renderQuad);
-		renderQuad.y += scale;
+		renderQuad.y += scaled / TILE_SZ;
 		SDL_RenderCopy(renderer, sprites, &num, &renderQuad);
 	}
 }
@@ -72,8 +72,8 @@ renderScene()
 void
 getTile(int sx, int sy, signed char *x, signed char *y)
 {
-	sx = (sx - originX) / (scale * TILE_SZ);
-	sy = (sy - originY) / (scale * TILE_SZ);
+	sx = (sx - originX) / scaled;
+	sy = (sy - originY) / scaled;
 	*x = (sx < 0 || sx >= BOARD_W) ? -1 : sx;
 	*y = (sy < 0 || sy >= BOARD_H) ? -1 : sy;
 }
@@ -197,9 +197,9 @@ init()
 	SDL_GetWindowSize(window, &w, &h);
 	scaleX = w / (BOARD_W * TILE_SZ);
 	scaleY = h / (BOARD_H * TILE_SZ);
-	scale = MIN(scaleX, scaleY);
-	originX = (w - scale * BOARD_W * TILE_SZ) >> 1;
-	originY = (h - scale * BOARD_H * TILE_SZ) >> 1;
+	scaled = TILE_SZ * MIN(scaleX, scaleY);
+	originX = (w - scaled * BOARD_W) >> 1;
+	originY = (h - scaled * BOARD_H) >> 1;
 	return SUCCESS;
 }
 
