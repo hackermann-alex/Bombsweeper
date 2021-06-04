@@ -42,20 +42,30 @@ flag(int8_t *state, unsigned char row, unsigned char col)
 }
 
 void
-newGame(game_t *game, unsigned char nMines)
+newGame(game_t *game)
 {
-	short i, j, tiles = BOARD_H * BOARD_W;
+	short i;
+
+	for (i = 0; i < BOARD_H * BOARD_W; ++i)
+		game->state[i] = UNDEF;
+	game->nMines = MINES;
+}
+
+void
+scatter(uint32_t *mines, unsigned char nMines, unsigned char row,
+		unsigned char col)
+{
+	short i, j, tiles = BOARD_H * BOARD_W - 9;
 	char tmp;
 
-	for (i = 0; i < tiles; ++i)
-		game->state[i] = UNDEF;
-	game->nMines = nMines;
 	srand(time(NULL));
 	for (i = 0; i < BOARD_H; ++i) {
-		game->mines[i] = 0;
+		mines[i] = 0;
 		for (j = 0; j < BOARD_W; ++j) {
-			tmp = RAND_MAX * (uint64_t)nMines / tiles-- >= rand();
-			game->mines[i] |= tmp << j;
+			if (i - row <= 1 && i - row >= -1 && j - col <= 1 && j - col >= -1)
+				continue;
+			tmp = RAND_MAX * (uint64_t)nMines / tiles-- > rand();
+			mines[i] |= tmp << j;
 			nMines -= tmp;
 		}
 	}

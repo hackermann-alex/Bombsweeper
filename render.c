@@ -59,13 +59,13 @@ renderTile(const int8_t state, unsigned char row, unsigned char col)
 }
 
 void
-renderScene(const int8_t *state)
+renderScene()
 {
 	unsigned char i, j;
 
 	for (i = 0; i < BOARD_H; ++i) {
 		for (j = 0; j < BOARD_W; ++j)
-			renderTile(state[BOARD_W * i + j], i, j);
+			renderTile(UNDEF, i, j);
 	}
 }
 
@@ -113,9 +113,32 @@ gameLoop()
 	game_t game;
 	signed char x, y;
 
-	newGame(&game, MINES);
-	renderScene(game.state);
+	newGame(&game);
+	renderScene();
 	SDL_RenderPresent(renderer);
+start:
+	while (SDL_WaitEvent(&e)) {
+		switch (e.type) {
+		case SDL_QUIT:
+			return;
+		case SDL_MOUSEBUTTONDOWN:
+			getTile(e.button.x, e.button.y, &x, &y);
+			if (x < 0 || y < 0)
+				goto start;
+			switch (e.button.button) {
+			case SDL_BUTTON_LEFT:
+				scatter(game.mines, MINES, y, x);
+				open(game.state, game.mines, y, x);
+				SDL_RenderPresent(renderer);
+				goto loop;
+			case SDL_BUTTON_RIGHT:
+				flag(game.state, y, x);
+				renderTile(game.state[BOARD_W * y + x], y, x);
+				SDL_RenderPresent(renderer);
+			}
+		}
+	}
+	goto start;
 loop:
 	while (SDL_WaitEvent(&e)) {
 		switch (e.type) {
