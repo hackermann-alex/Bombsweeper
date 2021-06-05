@@ -1,6 +1,6 @@
 OBJ = main.o render.o logic.o
 DEST = game
-INCS = -lSDL2 -lSDL2_gfx
+INCS = -lSDL2
 CFLAGS = -std=c99 -Wall -O3 -pedantic
 CC = cc
 
